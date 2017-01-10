@@ -1,1 +1,1 @@
-# ldap-password-self-service
+# ldap-password-self-service v1
