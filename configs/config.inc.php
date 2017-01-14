@@ -14,7 +14,7 @@ $ldap_config = array ('ldap_uri' => '',
 $gcaptcha_enable = false;
 $gcaptcha_secret = "";
 
-$sendgrid_api_key = '';
+$sendgrid_api_key = "";
 
 $keyphrase = "";
 ?>
