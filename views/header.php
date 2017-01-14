@@ -1,3 +1,7 @@
+<?php
+//print_r($_SESSION);
+//print_r($_GET);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,9 +28,7 @@
             <div class="row">
                 <div id="headerTitle" class="col-md-8"><h2><a href="<?php echo $homepage; ?>"><i class="fa fa-home" aria-hidden="true"></i> LDAP Password Management</a></h2></div>
                 <div class="col-md-4">
-                    <div id="headerLogoutButton" class="form-inline float-xs-right">
-                        <?php showLogoutButton(); ?>
-                    </div>
+                    <?php showLogoutButton(); ?>
                 </div>
             </div>
         </div>

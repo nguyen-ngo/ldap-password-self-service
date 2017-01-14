@@ -7,7 +7,8 @@
 if(!defined('IS_INCLUDE')) { die("This file can not run directly !!"); }
 
 require ($_SERVER["DOCUMENT_ROOT"]."/configs/config.inc.php");
-require ($_SERVER["DOCUMENT_ROOT"]."/vendors/sendgrid-php/vendor/autoload.php");
+//require ($_SERVER["DOCUMENT_ROOT"]."/vendors/sendgrid-php/vendor/autoload.php");
+require ($_SERVER["DOCUMENT_ROOT"]."/vendors/phpmailer/PHPMailerAutoload.php");
 
 $errorMessage = "";
 
@@ -25,7 +26,9 @@ ldap_set_option($ldapconn, OPT_DEBUG_LEVEL, 255);
  */
 function showLogoutButton() {
     if ($_SESSION && (!isset($_SESSION['token']) || sizeof($_SESSION) >= 3)) {
-        echo "<a class=\"btn btn-outline-success\" href=\"?type=logout\">Logout</a>";
+        echo "<div id='headerLogoutButton' class='form-inline float-xs-right'>";
+        echo "<a class='btn btn-outline-success' href='?type=logout'>Logout</a>";
+        echo "</div>";
     }
 }
 
@@ -33,6 +36,13 @@ function showLogoutButton() {
 function showGreeting() {
     if (sizeof($_SESSION) >= 3) {
         echo "<p>Howdy, ".$_SESSION['cn']."!</p><hr>";
+    }
+}
+
+function enableGCaptcha($flag) {
+    global $gcaptcha_secret;
+    if ($flag) {
+        echo "<div class='g-recaptcha' data-sitekey='".$gcaptcha_secret."'></div><br>";
     }
 }
 
@@ -210,8 +220,9 @@ function changePassword($userdn, $newpassword) {
 
 function sendMail($recipient, $content) {
     global $errorMessage;
+ /*
     global $sendgrid_api_key;
-    $from = new SendGrid\Email("LDAP Password Management administrator", "admin@example.com");
+    $from = new SendGrid\Email("LDAP Password Management administrator", "pwmadmin@yourdomain.com");
     $subject = "Notification mail from LDAP Password Management";
     $to = new SendGrid\Email("", $recipient);
     $body = new SendGrid\Content("text/html", $content);
@@ -219,6 +230,24 @@ function sendMail($recipient, $content) {
     $sg = new \SendGrid($sendgrid_api_key);
     $response = $sg->client->mail()->send()->post($mail);
     return $response->statusCode();
+ */
+    $mail = new PHPMailer();
+    //$mail->SMTPDebug = 2;
+    $mail->IsSMTP();
+    $mail->SMTPAuth = false;
+    $mail->Host = "mail.yourdomain.com";
+    $mail->Port = 25;
+    $mail->Username = "pwmadmin@yourdomain.com";
+    $mail->Password = "";
+    $mail->SetFrom('pwmadmin@yourdomain.com', 'LDAP Password Management administrator');
+    $mail->Subject = "Notification mail from LDAP Password Management";
+    $mail->MsgHTML($content);
+    $mail->AddAddress($recipient, "");
+    if($mail->Send()) {
+        return "200";
+    } else {
+        return $mail->ErrorInfo;
+    }
 }
 
 
@@ -244,7 +273,7 @@ function resetByToken() {
                 if ($changeResult != "OK") {
                     echo $changeResult;
                 } else {
-                    $mailContent = "Hello ".$userInfo[1].",\n\nYour password has been reset.\n\nYour new password is ".$randomString.".\n\nIf you didn't request to reset password, please contact your administrator immediately.";
+                    $mailContent = "Hello ".$userInfo[1].",<br>Your password has been reset.<br><br>Your new password is ".$randomString.".<br>If you didn't request to reset password, please contact your administrator immediately.";
                     // Send notification to user via email
                     $isSent = sendMail($userInfo[2], $mailContent);
                     if ($isSent != 200 && $isSent != 202) {

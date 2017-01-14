@@ -23,7 +23,7 @@
                         <span class="input-group-addon" id="basic-addon1"><i class="fa fa-key" aria-hidden="true"></i></span>
                         <input type="password" class="form-control" id="password" name="password" placeholder="Password" aria-describedby="basic-addon1" required>
                     </div><br>
-                    <div class="g-recaptcha" data-sitekey="<?php echo $gcaptcha_secret ?>"></div><br>
+                    <?php enableGCaptcha($gcaptcha_enable); ?>
                     <button type="button" class="btn btn-primary" id="authenticateButton">Authenticate</button>
                 </form>
                 <br>

@@ -3,6 +3,7 @@
  * Author: Ngo, Nguyen Da
  * Email: ngodanguyen@gmail.com
  */
+error_reporting(0);
 
 if ($_POST['loginActive'] == "") { die("Can not run directly !!"); } else { define('IS_INCLUDE', true); }
 
@@ -17,15 +18,18 @@ $errorMessage = "";
 
 
 if ($_GET['action'] == 'authenticate') {
-    if (!$_POST['gcaptcha']) {
-        $errorMessage .= "<p>&#9888; Please check the Captcha</p>";
-    } else {
-        $response = json_decode(file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=".$gcaptcha_secret."&response=".$_POST['gcaptcha']."&remoteip=".$_SERVER['REMOTE_ADDR']), true);
-        if (!$response['success']) {
-            $errorMessage .= "<p>&#9888; There's something wrong with gCaptcha</p>";
+/*
+    if ($gcaptcha_enable) {
+        if (!$_POST['gcaptcha']) {
+            $errorMessage .= "<p>&#9888; Please check the Captcha</p>";
+        } else {
+            $response = json_decode(file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=".$gcaptcha_secret."&response=".$_POST['gcaptcha']."&remoteip=".$_SERVER['REMOTE_ADDR']), true);
+            if (!$response['success']) {
+                $errorMessage .= "<p>&#9888; There's something wrong with gCaptcha</p>";
+            }
         }
     }
-
+*/
     if (!$_POST['username']) {
         $errorMessage .= "<p>&#9888; Username is required</p>";
     }
@@ -103,7 +107,7 @@ if ($_GET['action'] == 'changepass') {
             if ($changeResult != "OK") {
                 echo $changeResult;
             } else {
-                $mailContent = "Hello ".$_SESSION['cn'].",\n\nYour password has been changed.\n\nIf you didn't change password, please contact your administrator immediately.";
+                $mailContent = "Hello ".$_SESSION['cn'].",<br><br>Your password has been changed.<br>If you didn't change password, please contact your administrator immediately.";
                 // Send notification to user via email
                 $isSent = sendMail($_SESSION['mail'], $mailContent);
                 if ($isSent != 200 && $isSent != 202) {
@@ -116,15 +120,18 @@ if ($_GET['action'] == 'changepass') {
 
 
 if ($_GET['action'] == 'reset') {
-        if (!$_POST['gcaptcha']) {
-            $errorMessage .= "<p>&#9888; Please check the Captcha</p>";
-        } else {
-            $response = json_decode(file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=".$gcaptcha_secret."&response=".$_POST['gcaptcha']."&remoteip=".$_SERVER['REMOTE_ADDR']), true);
-            if (!$response['success']) {
-                $errorMessage .= "<p>&#9888; There's something wrong with gCaptcha</p>";
-            }
-        }
-
+/*
+       if ($gcaptcha_enable) {
+           if (!$_POST['gcaptcha']) {
+               $errorMessage .= "<p>&#9888; Please check the Captcha</p>";
+           } else {
+               $response = json_decode(file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=".$gcaptcha_secret."&response=".$_POST['gcaptcha']."&remoteip=".$_SERVER['REMOTE_ADDR']), true);
+               if (!$response['success']) {
+                   $errorMessage .= "<p>&#9888; There's something wrong with gCaptcha</p>";
+               }
+           }
+       }
+*/
     if (!$_POST['username']) {
         $errorMessage .= "<p>&#9888; Username is required</p>";
     }
@@ -175,7 +182,7 @@ if ($_GET['action'] == 'reset') {
     // Generate link to verify reset password
     $verifyLink = $homepage."?type=resetbytoken&token=".$token;
     // Generate mail content
-    $mailContent = "Hello $user,\n\nClick the link below to reset your password\n$verifyLink\n\nIf you didn't request a password reset, please ignore this email.";
+    $mailContent = "Hello ".$user.",<br><br>Click the link below to reset your password<br>".$verifyLink."<br><br>If you didn't request a password reset, please ignore this email.";
     // Send verify link to user via email
     $isSent = sendMail($email, $mailContent);
     if ($isSent != 200 && $isSent != 202) {

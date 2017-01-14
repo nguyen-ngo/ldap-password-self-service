@@ -23,7 +23,7 @@
                         <span class="input-group-addon" id="basic-addon1"><i class="fa fa-envelope-open-o" aria-hidden="true"></i></span>
                         <input type="email" class="form-control" id="email" name="email" placeholder="Email" aria-describedby="basic-addon1" required>
                     </div><br>
-                    <div class="g-recaptcha" data-sitekey="<?php echo $gcaptcha_secret ?>"></div><br>
+                    <?php enableGCaptcha($gcaptcha_enable); ?>
                     <button type="button" class="btn btn-primary" id="sendPasswordButton">Send new password</button>
                 </form>
             </div>
